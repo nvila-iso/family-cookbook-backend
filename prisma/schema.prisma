@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  firstName         String
+  lastName          String
+  username          String    @unique
+  password          String
+  email             String    @unique
+  familyId Int?
+  family            Family?   @relation(fields: [familyId], references: [id])
+  createdAt         DateTime  @default(now())
+  passwordChangedAt DateTime  @default(now())
+
+  recipes Recipe[]
+}
+
+model Recipe {
+  id  Int @id @default(autoincrement())
+  title String
+  servings Int? // might need to change for things like (1-2) or (3 - 4)
+  prepTime Int? //  minutes
+  cookTime Int? //  minutes
+
+  images RecipeImage[] // one to many for photos
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // related to
+  createdById Int
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  familyId Int
+  family Family @relation(fields: [familyId], references: [id])
+
+
+}
+
+model RecipeImage {
+  id Int @id @default(autoincrement())
+  url String
+  recipeId  Int
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+}
+
+model Family {
+  id Int @id @default(autoincrement())
+  name String
+  code String @unique // join code to send
+  createdAt DateTime @default(now())
+
+  users User[]
+  recipes Recipe[]
+}
