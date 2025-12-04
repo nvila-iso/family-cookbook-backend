@@ -17,6 +17,14 @@ export async function registerUser(data: {
   });
 }
 
+// patch user data
+export async function updateUserProfile(id, data) {
+  return prisma.user.update({
+    where: { id },
+    data,
+  });
+}
+
 // Find User via Email
 export async function findUserByEmail(email: string) {
   return prisma.user.findUnique({ where: { email } });

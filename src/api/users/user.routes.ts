@@ -1,7 +1,12 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUserByEmail, registerUser } from "./user.service";
+import { authenticate } from "../../middleware/authMiddleware.ts";
+import {
+  findUserByEmail,
+  registerUser,
+  updateUserProfile,
+} from "./user.service.ts";
 
 const router = Router();
 // --> api/users/register
@@ -52,6 +57,40 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Login failed" });
+  }
+});
+
+// --> profile patching (not password)
+router.patch("/:id/profile", authenticate, async (req, res) => {
+  const requestedId = Number(req.params.id);
+  const loggedInId = req.user.id;
+
+  if (requestedId !== loggedInId) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  const { firstName, lastName, username } = req.body;
+
+  try {
+    const updatedUser = await updateUserProfile(loggedInId, {
+      firstName,
+      lastName,
+      username,
+    });
+
+    return res.json({
+      message: "Profile updates",
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        username: updatedUser.username,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Profile update failed" });
   }
 });
 

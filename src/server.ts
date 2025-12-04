@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import { prisma } from "../lib/prisma.js";
 
+// ROUTES
 import userRoutes from "./api/users/user.routes.js";
+import familyRoutes from "./api/families/family.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +28,7 @@ app.get("/api/users", async (req, res) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/families", familyRoutes);
 
 // Server Startup
 app.listen(PORT, () => {
