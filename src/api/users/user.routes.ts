@@ -6,6 +6,7 @@ import {
   findUserByEmail,
   registerUser,
   updateUserProfile,
+  findUserById,
 } from "./user.service.ts";
 
 const router = Router();
@@ -79,16 +80,7 @@ router.patch("/:id/profile", authenticate, async (req, res) => {
       username,
     });
 
-    return res.json({
-      message: "Profile updates",
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        username: updatedUser.username,
-      },
-    });
+    return res.json(updatedUser);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Profile update failed" });
@@ -98,7 +90,7 @@ router.patch("/:id/profile", authenticate, async (req, res) => {
 // --> api/users/profile
 router.get("/profile", authenticate, async (req, res) => {
   try {
-    const user = await findUserByEmail(req.user.email);
+    const user = await findUserById(req.user.id);
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -111,7 +103,7 @@ router.get("/profile", authenticate, async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
-        family: user.familyId,
+        familyId: user.familyId,
       },
     });
   } catch (error) {

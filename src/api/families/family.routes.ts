@@ -59,15 +59,27 @@ router.post("/join", authenticate, async (req, res) => {
     });
 
     if (!family) {
-      res.status(404).json({ error: "Invalid family code" });
+      return res.status(404).json({ error: "Invalid family code" });
     }
 
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { familyId: family.id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        username: true,
+        familyId: true,
+      },
     });
 
-    return res.json({ message: "Joined family successfully!", family });
+    return res.json({
+      message: "Joined family successfully!",
+      user: updatedUser,
+      family,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Joining family failed" });
