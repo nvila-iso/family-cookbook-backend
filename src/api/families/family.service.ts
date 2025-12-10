@@ -52,7 +52,17 @@ export async function findFamilyBySlug(slug: string) {
   return prisma.family.findUnique({
     where: { slug },
     include: {
-      members: true,
+      members: {
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          username: true,
+          familyId: true,
+        },
+      },
+      recipes: false,
     },
   });
 }
