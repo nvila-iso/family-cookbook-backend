@@ -6,6 +6,7 @@ import {
   searchFamiliesByName,
   createFamily,
   generateFamilyCode,
+  findFamilyBySlug,
 } from "./family.service.ts";
 
 const router = Router();
@@ -83,6 +84,24 @@ router.post("/join", authenticate, async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Joining family failed" });
+  }
+});
+
+// --> api/families/:slug
+router.get("/:slug", async (req, res) => {
+  const { slug } = req.params;
+
+  try {
+    const family = await findFamilyBySlug(slug);
+
+    if (!family) {
+      return res.status(404).json({ error: "Family not found" });
+    }
+
+    return res.json({ family });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error fetching family" });
   }
 });
 

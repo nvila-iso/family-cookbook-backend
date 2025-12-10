@@ -1,4 +1,5 @@
 import { prisma } from "../../../lib/prisma.ts";
+import { nanoid } from "nanoid";
 
 export async function searchFamiliesByName(name: string) {
   return prisma.family.findMany({
@@ -9,6 +10,18 @@ export async function searchFamiliesByName(name: string) {
       },
     },
   });
+}
+
+// --> slug generator to differentiate families with similar names
+// --> const slug = generateFamilySlug(familyName);
+export function generateFamilySlug(name: string): string {
+  const base = name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-");
+
+  return `${base}-${nanoid(4)}`;
 }
 
 // --> generating random code for family
@@ -25,10 +38,21 @@ export function generateFamilyCode() {
 }
 
 export async function createFamily(name: string, code: string) {
+  const slug = generateFamilySlug;
   return prisma.family.create({
     data: {
       name,
       code,
+      slug,
+    },
+  });
+}
+
+export async function findFamilyBySlug(slug: string) {
+  return prisma.family.findUnique({
+    where: { slug },
+    include: {
+      members: true,
     },
   });
 }

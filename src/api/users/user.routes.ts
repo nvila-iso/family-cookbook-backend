@@ -103,7 +103,7 @@ router.get("/profile", authenticate, async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
-        familyId: user.familyId,
+        family: user.family,
       },
     });
   } catch (error) {

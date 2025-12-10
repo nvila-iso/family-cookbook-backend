@@ -60,9 +60,10 @@ model RecipeImage {
 model Family {
   id Int @id @default(autoincrement())
   name String
+  slug String @unique
   code String @unique // join code to send
   createdAt DateTime @default(now())
 
-  users User[]
+  members User[]
   recipes Recipe[]
 }
