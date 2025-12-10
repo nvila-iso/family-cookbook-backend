@@ -34,14 +34,23 @@ router.post("/create", authenticate, async (req, res) => {
     const family = await createFamily(name, code);
 
     // add user creating family to family
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { familyId: family.id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        username: true,
+        familyId: true,
+      },
     });
 
     return res.json({
       message: "Family created successfully",
       family,
+      user: updatedUser,
     });
   } catch (error) {
     console.error(error);

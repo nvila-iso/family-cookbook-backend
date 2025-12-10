@@ -38,7 +38,7 @@ export function generateFamilyCode() {
 }
 
 export async function createFamily(name: string, code: string) {
-  const slug = generateFamilySlug;
+  const slug = generateFamilySlug(name);
   return prisma.family.create({
     data: {
       name,

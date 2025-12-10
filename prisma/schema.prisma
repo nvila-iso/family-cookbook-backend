@@ -21,7 +21,7 @@ model User {
   password          String
   email             String    @unique
   familyId Int?
-  family            Family?   @relation(fields: [familyId], references: [id])
+  family            Family?   @relation(fields: [familyId], references: [id], onDelete: SetNull)
   createdAt         DateTime  @default(now())
   passwordChangedAt DateTime  @default(now())
 
@@ -41,11 +41,11 @@ model Recipe {
   updatedAt DateTime @updatedAt
 
   // related to
-  createdById Int
-  createdBy User @relation(fields: [createdById], references: [id])
+  createdById Int?
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
-  familyId Int
-  family Family @relation(fields: [familyId], references: [id])
+  familyId Int?
+  family Family? @relation(fields: [familyId], references: [id], onDelete: SetNull)
 
 
 }
@@ -54,7 +54,7 @@ model RecipeImage {
   id Int @id @default(autoincrement())
   url String
   recipeId  Int
-  recipe Recipe @relation(fields: [recipeId], references: [id])
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 }
 
 model Family {

@@ -7,6 +7,7 @@ import {
   registerUser,
   updateUserProfile,
   findUserById,
+  deleteUserById,
 } from "./user.service.ts";
 
 const router = Router();
@@ -109,6 +110,24 @@ router.get("/profile", authenticate, async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Failed to load user profile" });
+  }
+});
+
+// --> DELETE api/users/:id
+router.delete("/:id", authenticate, async (req, res) => {
+  const requestedId = Number(req.params.id);
+  const loggedInId = req.user.id;
+
+  if (requestedId !== loggedInId) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  try {
+    const { id } = await deleteUserById(loggedInId);
+    return res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to delete user" });
   }
 });
 

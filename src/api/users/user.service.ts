@@ -39,3 +39,10 @@ export async function findUserById(id) {
     include: { family: true },
   });
 }
+
+// Delete User Account
+export async function deleteUserById(id) {
+  return prisma.user.delete({
+    where: { id },
+  });
+}
