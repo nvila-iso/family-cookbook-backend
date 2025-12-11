@@ -24,7 +24,7 @@ model User {
   family            Family?   @relation(fields: [familyId], references: [id], onDelete: SetNull)
   createdAt         DateTime  @default(now())
   passwordChangedAt DateTime  @default(now())
-
+  
   recipes Recipe[]
 }
 
@@ -63,6 +63,10 @@ model Family {
   slug String @unique
   code String @unique // join code to send
   createdAt DateTime @default(now())
+  initialColor String?
+  initialBg String?
+  cookbookBg String?
+  bio String?
 
   members User[]
   recipes Recipe[]

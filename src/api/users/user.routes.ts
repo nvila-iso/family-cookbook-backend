@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         username: user.username,
-        family: user.familyId,
+        family: user.family,
       },
     });
   } catch (error) {
@@ -63,6 +63,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// !!! THIS NEEDS TO BE CHANGES TO SETTINGS !!!
 // --> profile patching (not password)
 router.patch("/:id/profile", authenticate, async (req, res) => {
   const requestedId = Number(req.params.id);
@@ -88,6 +89,7 @@ router.patch("/:id/profile", authenticate, async (req, res) => {
   }
 });
 
+// !!! THIS NEEDS TO BE CHANGES TO SETTINGS !!!
 // --> api/users/profile
 router.get("/profile", authenticate, async (req, res) => {
   try {

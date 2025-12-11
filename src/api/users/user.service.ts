@@ -29,7 +29,19 @@ export async function updateUserProfile(id, data) {
 
 // Find User via Email
 export async function findUserByEmail(email: string) {
-  return prisma.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({
+    where: { email },
+    include: {
+      family: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          code: true,
+        },
+      },
+    },
+  });
 }
 
 // Find User via Id
