@@ -4,7 +4,12 @@ import {
   requireFamily,
 } from "../../middleware/authMiddleware.ts";
 
-import { createRecipe, getRecipesByFamilyId } from "./recipe.service.js";
+import {
+  createRecipe,
+  getRecipesByFamilyId,
+  publishRecipe,
+  getRecipeById,
+} from "./recipe.service.js";
 
 const router = Router();
 
@@ -25,7 +30,7 @@ router.get("/family/:familyId", authenticate, async (req, res) => {
   }
 });
 
-// CREATE family recipes
+// CREATE DRAFT recipe
 router.post("/", authenticate, requireFamily, async (req, res) => {
   const { title } = req.body;
   const familyId = req.user.family.id;
@@ -46,6 +51,41 @@ router.post("/", authenticate, requireFamily, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to create recipe" });
+  }
+});
+
+// PUBLISH recipe
+router.post("/:id/publish", authenticate, requireFamily, async (req, res) => {
+  const recipeId = Number(req.params.id);
+
+  if (Number.isNaN(recipeId)) {
+    return res.status(400).json({ error: "Invalid recipe id" });
+  }
+
+  try {
+    const recipe = await getRecipeById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+
+    if (recipe.familyId !== req.user.family.id) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to publish this recipe" });
+    }
+
+    if (recipe.status === "PUBLISHED") {
+      return res.status(409).json({
+        error: "Recipe is already published",
+      });
+    }
+
+    const publishedRecipe = await publishRecipe(recipeId);
+    res.json(publishedRecipe);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to publish recipe" });
   }
 });
 
