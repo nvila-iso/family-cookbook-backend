@@ -9,6 +9,7 @@ import {
   getRecipesByFamilyId,
   publishRecipe,
   getRecipeById,
+  createRecipeStep,
 } from "./recipe.service.js";
 
 const router = Router();
@@ -51,6 +52,46 @@ router.post("/", authenticate, requireFamily, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to create recipe" });
+  }
+});
+
+// CREATE Recipe Step
+router.post("/:id/steps", authenticate, requireFamily, async (req, res) => {
+  const recipeId = Number(req.params.id);
+  const { stepNumber, instruction } = req.body;
+
+  console.log("JWT payload:", req.user);
+
+  if (Number.isNaN(recipeId)) {
+    return res.status(400).json({ error: "Invalid recipe id" });
+  }
+
+  if (typeof stepNumber !== "number" || !instruction) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const recipe = await getRecipeById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+    if (recipe.familyId !== req.user.family.id) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to edit this recipe" });
+    }
+
+    const step = await createRecipeStep({
+      recipeId,
+      stepNumber,
+      instruction,
+    });
+
+    res.status(201).json(step);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create recipe step" });
   }
 });
 

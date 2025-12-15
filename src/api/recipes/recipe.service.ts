@@ -26,6 +26,17 @@ export async function createRecipe(data: {
   });
 }
 
+// CREATE Recipe Step
+export async function createRecipeStep(data: {
+  recipeId: number;
+  stepNumber: number;
+  instruction: string;
+}) {
+  return prisma.recipeStep.create({
+    data,
+  });
+}
+
 // PUBLISH recipe
 export async function publishRecipe(recipeId: number) {
   return prisma.recipe.update({
