@@ -51,5 +51,12 @@ export async function publishRecipe(recipeId: number) {
 export async function getRecipeById(recipeId: number) {
   return prisma.recipe.findUnique({
     where: { id: recipeId },
+    include: {
+      steps: {
+        orderBy: {
+          stepNumber: "asc",
+        },
+      },
+    },
   });
 }

@@ -23,6 +23,11 @@ enum RecipeImageType {
   STEP
 }
 
+enum RecipeVisibility {
+  PUBLIC
+  PRIVATE
+}
+
 model User {
   id                Int       @id @default(autoincrement())
   firstName         String?
@@ -48,6 +53,7 @@ model Recipe {
   videoUrl String?
 
   status RecipeStatus @default(DRAFT)
+  visibility RecipeVisibility @default(PRIVATE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   authenticate,
   requireFamily,
+  authenticateOptional,
 } from "../../middleware/authMiddleware.ts";
 
 import {
@@ -28,6 +29,44 @@ router.get("/family/:familyId", authenticate, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch recipes" });
+  }
+});
+
+// GET recipe by id w/ steps
+router.get("/:id", authenticateOptional, async (req, res) => {
+  const recipeId = Number(req.params.id);
+
+  if (Number.isNaN(recipeId)) {
+    return res.status(400).json({ error: "Invalid recipe id" });
+  }
+
+  try {
+    const recipe = await getRecipeById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+
+    // public view
+    if (recipe.visibility === "PUBLIC") {
+      return res.json(recipe);
+    }
+
+    // private view
+    if (!req.user || !req.user.family) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (recipe.familyId !== req.user.family.id) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to view this recipe" });
+    }
+
+    res.json(recipe);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch recipe" });
   }
 });
 

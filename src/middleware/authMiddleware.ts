@@ -26,3 +26,28 @@ export function requireFamily(req, res, next) {
 
   next();
 }
+
+export function authenticateOptional(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    req.user = null;
+    return next();
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+  } catch (error) {
+    console.error(error);
+    req.user = null;
+  }
+  next();
+}
