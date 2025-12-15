@@ -6,7 +6,8 @@ import {
   searchFamiliesByName,
   createFamily,
   generateFamilyCode,
-  findFamilyBySlug,
+  findPublicFamilyBySlug,
+  findPrivateFamilyBySlug,
 } from "./family.service.ts";
 
 const router = Router();
@@ -97,11 +98,17 @@ router.post("/join", authenticate, async (req, res) => {
 });
 
 // --> api/families/:slug
-router.get("/:slug", async (req, res) => {
+router.get("/:slug", authenticate, async (req, res) => {
   const { slug } = req.params;
 
   try {
-    const family = await findFamilyBySlug(slug);
+    const family = await findPrivateFamilyBySlug(slug);
+
+    if (family.id !== req.user.family?.id) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to view this family" });
+    }
 
     if (!family) {
       return res.status(404).json({ error: "Family not found" });
@@ -111,6 +118,25 @@ router.get("/:slug", async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server error fetching family" });
+  }
+});
+
+router.get("/:slug/public", async (req, res) => {
+  const { slug } = req.params;
+
+  try {
+    const family = await findPublicFamilyBySlug(slug);
+
+    if (!family) {
+      return res.status(404).json({ error: "Family not found" });
+    }
+
+    return res.json({ family });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ error: "Server error fetching public family" });
   }
 });
 

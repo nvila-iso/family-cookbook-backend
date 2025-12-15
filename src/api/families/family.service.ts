@@ -48,7 +48,7 @@ export async function createFamily(name: string, code: string) {
   });
 }
 
-export async function findFamilyBySlug(slug: string) {
+export async function findPrivateFamilyBySlug(slug: string) {
   return prisma.family.findUnique({
     where: { slug },
     include: {
@@ -62,7 +62,35 @@ export async function findFamilyBySlug(slug: string) {
           familyId: true,
         },
       },
-      recipes: false,
+      recipes: true,
+    },
+  });
+}
+
+// --> public grab
+export async function findPublicFamilyBySlug(slug: string) {
+  return prisma.family.findUnique({
+    where: { slug },
+    include: {
+      members: {
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          username: true,
+          familyId: true,
+        },
+      },
+      recipes: {
+        where: {
+          visibility: "PUBLIC",
+          status: "PUBLISHED",
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 }
