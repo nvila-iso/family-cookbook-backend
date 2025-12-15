@@ -11,9 +11,21 @@ import {
   publishRecipe,
   getRecipeById,
   createRecipeStep,
+  getPublicRecipes,
 } from "./recipe.service.js";
 
 const router = Router();
+
+// GET public recipes
+router.get("/public", async (req, res) => {
+  try {
+    const recipes = await getPublicRecipes();
+    res.json(recipes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch public recipes" });
+  }
+});
 
 // GET recipes from a family
 router.get("/family/:familyId", authenticate, async (req, res) => {

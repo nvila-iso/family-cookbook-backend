@@ -60,3 +60,16 @@ export async function getRecipeById(recipeId: number) {
     },
   });
 }
+
+// GET ALL public recipes
+export async function getPublicRecipes() {
+  return prisma.recipe.findMany({
+    where: {
+      visibility: "PUBLIC",
+      status: "PUBLISHED",
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
