@@ -60,7 +60,7 @@ router.get("/:id", authenticateOptional, async (req, res) => {
     }
 
     // public view
-    if (recipe.visibility === "PUBLIC") {
+    if (recipe.visibility === "PUBLIC" && recipe.status === "PUBLISHED") {
       return res.json(recipe);
     }
 
