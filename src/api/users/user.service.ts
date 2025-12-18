@@ -12,7 +12,7 @@ export async function registerUser(data: { email: string; password: string }) {
 }
 
 // patch user data
-export async function updateUserProfile(id, data) {
+export async function updateUserProfile(id: number, data: any) {
   return prisma.user.update({
     where: { id },
     data,
@@ -22,7 +22,8 @@ export async function updateUserProfile(id, data) {
       firstName: true,
       lastName: true,
       username: true,
-      familyId: true,
+      family: true,
+      avatarUrl: true,
     },
   });
 }
@@ -45,10 +46,25 @@ export async function findUserByEmail(email: string) {
 }
 
 // Find User via Id
-export async function findUserById(id) {
-  return await prisma.user.findUnique({
+export async function findUserById(id: number) {
+  return prisma.user.findUnique({
     where: { id },
-    include: { family: true },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      username: true,
+      avatarUrl: true,
+      familyId: true,
+      family: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
   });
 }
 

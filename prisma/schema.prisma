@@ -39,7 +39,7 @@ model User {
   family            Family?   @relation(fields: [familyId], references: [id], onDelete: SetNull)
   createdAt         DateTime  @default(now())
   passwordChangedAt DateTime  @default(now())
-  
+  avatarUrl String?
   recipes Recipe[]
 }
 

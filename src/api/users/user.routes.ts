@@ -1,4 +1,6 @@
 import { Router } from "express";
+import fs from "fs";
+import path from "path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { authenticate } from "../../middleware/authMiddleware.ts";
@@ -9,6 +11,8 @@ import {
   findUserById,
   deleteUserById,
 } from "./user.service.ts";
+
+import { avatarUpload } from "../../middleware/avatarUpload.js";
 
 const router = Router();
 // --> api/users/register
@@ -103,16 +107,7 @@ router.get("/profile", authenticate, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    return res.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        family: user.family,
-      },
-    });
+    return res.json({ user });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Failed to load user profile" });
@@ -134,6 +129,49 @@ router.delete("/:id", authenticate, async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+router.post(
+  "/avatar",
+  authenticate,
+  avatarUpload.single("avatar"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+    const updatedUser = await updateUserProfile(req.user.id, {
+      avatarUrl,
+    });
+
+    res.json({ user: updatedUser });
+  }
+);
+
+router.patch("/avatar", authenticate, async (req, res) => {
+  try {
+    const user = await findUserById(req.user.id);
+
+    if (!user?.avatarUrl) {
+      return res.status(400).json({ error: "No avatar to delete" });
+    }
+
+    const filePath = path.join(process.cwd(), user.avatarUrl);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    const updatedUser = await updateUserProfile(req.user.id, {
+      avatarUrl: null,
+    });
+
+    res.json({ user: updatedUser });
+  } catch (error) {
+    console.error("Delete avatar failed:", error);
+    res.status(500).json({ error: "Failed to delete avatar" });
   }
 });
 

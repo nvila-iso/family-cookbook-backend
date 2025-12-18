@@ -113,8 +113,6 @@ router.post("/:id/steps", authenticate, requireFamily, async (req, res) => {
   const recipeId = Number(req.params.id);
   const { stepNumber, instruction } = req.body;
 
-  console.log("JWT payload:", req.user);
-
   if (Number.isNaN(recipeId)) {
     return res.status(400).json({ error: "Invalid recipe id" });
   }
