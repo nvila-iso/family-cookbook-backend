@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { prisma } from "../lib/prisma.js";
+import path from "path";
 
 // ROUTES
 import userRoutes from "./api/users/user.routes.js";
@@ -31,6 +32,7 @@ app.get("/api/users", async (req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/families", familyRoutes);
 app.use("/api/recipes", recipesRoute);
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Server Startup
 app.listen(PORT, () => {

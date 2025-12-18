@@ -5,6 +5,8 @@ import {
   authenticateOptional,
 } from "../../middleware/authMiddleware.ts";
 
+import { uploadRecipeImage } from "../../middleware/upload.js";
+
 import {
   createRecipe,
   getRecipesByFamilyId,
@@ -179,6 +181,18 @@ router.post("/:id/publish", authenticate, requireFamily, async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Failed to publish recipe" });
   }
+});
+
+// IMAGE UPLOAD TEST
+router.post("/upload-test", uploadRecipeImage.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "Noo file uploaded" });
+  }
+
+  res.json({
+    message: "Upload successful",
+    file: req.file,
+  });
 });
 
 export default router;
