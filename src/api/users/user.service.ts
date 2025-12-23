@@ -12,7 +12,24 @@ export async function registerUser(data: { email: string; password: string }) {
 }
 
 // patch user data
-export async function updateUserProfile(id: number, data: any) {
+export async function updateUserProfile(
+  id: number,
+  updates: {
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+  }
+) {
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === "") {
+      throw new Error(`${key} cannot be empty`);
+    }
+  }
+
+  const data = Object.fromEntries(
+    Object.entries(updates).filter(([_, value]) => value !== undefined)
+  );
+
   return prisma.user.update({
     where: { id },
     data,

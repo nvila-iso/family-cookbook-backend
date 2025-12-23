@@ -83,6 +83,10 @@ router.patch("/:id/profile", authenticate, async (req, res) => {
 
   const { firstName, lastName, username } = req.body;
 
+  if (!firstName || !lastName || !username) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
   try {
     const updatedUser = await updateUserProfile(loggedInId, {
       firstName,
