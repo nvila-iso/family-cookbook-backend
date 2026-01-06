@@ -46,6 +46,7 @@ model User {
 model Recipe {
   id  Int @id @default(autoincrement())
   title String
+  notes String?
   servings String? // might need to change for things like (1-2) or (3 - 4)
   prepTime Int? //  minutes
   cookTime Int? //  minutes
