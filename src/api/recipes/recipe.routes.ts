@@ -86,9 +86,10 @@ router.get("/:id", authenticateOptional, async (req, res) => {
 
 // CREATE DRAFT recipe
 router.post("/", authenticate, requireFamily, async (req, res) => {
-  const { title } = req.body;
+  const { title, notes, servings, cookTime, prepTime } = req.body;
   const familyId = req.user.family.id;
   const userId = req.user.id;
+  const visibility = req.body.visibility === "PUBLIC" ? "PUBLIC" : "PRIVATE";
 
   if (!title) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -97,6 +98,11 @@ router.post("/", authenticate, requireFamily, async (req, res) => {
   try {
     const recipe = await createRecipe({
       title,
+      notes,
+      servings,
+      cookTime,
+      prepTime,
+      visibility,
       familyId: Number(familyId),
       createdById: userId,
     });
